@@ -1,159 +1,75 @@
 
+import chromosomes.Chromosome;
+import com.sun.javafx.scene.CameraHelper;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
  * Created by Jp on 06/10/2018.
  */
 public class GA {
-    public ArrayList<short[]> population;
-    private int populationSize;
-    private int chromosomeSize;
-    private double mutationProbability;
-    private double convergeMinimumRate;
-    private double crossProbability;
 
-    public GA(int populationSize, int chromosomeSize, double mutationProbability, double convergeMinimumRate, double crossProbability){
-        this.populationSize = populationSize;
-        population =new ArrayList<>();
-        this.chromosomeSize = chromosomeSize;
-        this.mutationProbability=mutationProbability;
-        this.convergeMinimumRate=convergeMinimumRate;
-        this.crossProbability=crossProbability;
-    }
-
-    public int run(){
-        generate();
+    public static List<Chromosome> run(List<Chromosome> population, double crossProbability, double mutationProbability, double convergeMinimumRate){
         int generationCounter=0;
-        while (!doesConverge()){
-            ArrayList<short[]> temporalPopulation=new ArrayList<>();
+        while (!doesConverge(population, convergeMinimumRate)){
+            ArrayList<Chromosome> temporalPopulation=new ArrayList<>();
             int crossNumber=(int)(crossProbability*100);
             for(int index=0; index<crossNumber/2; index++){
-                ArrayList<short[]> chosenOnes=getTwoCromosome();
-                ArrayList<short[]> descendents=cross(chosenOnes.get(0), chosenOnes.get(1));
-                mutate(descendents.get(0));
-                mutate(descendents.get(1));
+                ArrayList<Chromosome> chosenOnes=getTwoCromosome(population);
+                List<Chromosome> descendents=chosenOnes.get(0).cross(chosenOnes.get(1));
+                mutate(descendents.get(0), mutationProbability);
+                mutate(descendents.get(1), mutationProbability);
                 temporalPopulation.addAll(descendents);
             }
-            int criticalFitness=fitnessSummatory()/population.size()+1;
+            int criticalFitness=fitnessSummatory(population)/population.size()+1;
             population.addAll(temporalPopulation);
-            if(!doesConverge()){
+            if(!doesConverge(population, convergeMinimumRate)){
                 System.out.println("       antes "+population.size());
-                reduxPopulation(criticalFitness);
+                reduxPopulation(criticalFitness, population);
                 System.out.println("       despues: "+population.size());
                 System.out.println("       fitness "+criticalFitness);
             }
             generationCounter++;
         }
-        return generationCounter;
+        System.out.println(generationCounter+" generaciones");
+        return population;
     }
 
-    public void reduxPopulation(int averageFitness){
+    public static void reduxPopulation(int averageFitness, List<Chromosome> population){
         for(int index=0; index<population.size(); index++){
-            short[] chromosome=population.get(index);
-            if(fitness(chromosome)<averageFitness){
+            Chromosome chromosome=population.get(index);
+            if(chromosome.getFitness()<averageFitness){
                 population.remove(chromosome);
                 index--;
             }
         }
     }
 
-    public ArrayList<short[]> generate(){
-        population =new ArrayList<>();
-        for(int index = 1; index<= populationSize; index++){
-            population.add(generateUnit());
-        }
-        return population;
-    }
-
-    public short[] generateUnit(){
-        short[] unit=new short[chromosomeSize];
-        for (int index = 0; index< chromosomeSize; index++){
-            Random r=new Random();
-            int aux=(r.nextInt()*1)+10;
-            if(aux%2==0){
-                unit[index]=1;
-            }
-            else {
-                unit[index]=0;
-            }
-        }
-        return unit;
-    }
-
-    public void mutate(short[] chromosome){
+    public static void mutate(Chromosome chromosome, double mutationProbability){
         Random random=new Random();
         double aux=random.nextDouble();
         if(aux>=mutationProbability){
-            int randomIndex=(int)random.nextDouble()*(chromosomeSize-1);
-            if(chromosome[randomIndex]==1){
-                chromosome[randomIndex]=0;
-            }
-            else {
-                chromosome[randomIndex]=1;
-            }
+            chromosome.mutate();
             System.out.println("       Muto");
         }
     }
 
-    public boolean doesConverge(){
+    public static boolean doesConverge(List<Chromosome> population, double convergeMinimumRate){
         int convergeCounter=0;
-        for(short[] chromosome: population){
-            if(fitness(chromosome)== chromosomeSize){
+        for(Chromosome chromosome: population){
+            if(chromosome.converged()){
                 convergeCounter++;
             }
         }
         return (convergeCounter/population.size())>=convergeMinimumRate;
     }
 
-    public int fitness(short[] unit){
-        int counter=0;
-        for (short chromosome: unit){
-            if(chromosome==1){
-                counter++;
-            }
-        }
-        return counter;
-    }
-
-    public ArrayList<short[]> cross(short[] chromosome1, short[] chromosome2){
-        Random random=new Random();
-        int firstBound=(int)(random.nextDouble()*(chromosomeSize -1));
-        int secondBound=(int)(random.nextDouble()*(chromosomeSize -1));
-        while(secondBound==firstBound){
-            secondBound=(int)(random.nextDouble()*(chromosomeSize -1));
-        }
-        if(firstBound<secondBound){
-            return cross(chromosome1,chromosome2,firstBound,secondBound);
-        }
-        else{
-            return cross(chromosome1,chromosome2,secondBound,firstBound);
-        }
-    }
-
-    private ArrayList<short[]> cross (short[] chromosome1, short[] chromosome2, int lowerBound, int upperBound){
-        ArrayList<short[]> newGeneration=new ArrayList<>();
-        short[] firstDescendent=new short[chromosomeSize];
-        short[] secondDescendent=new short[chromosomeSize];
-        for(int index = 0; index< chromosomeSize; index++){
-            if(index>=lowerBound&&index<=upperBound){
-                firstDescendent[index]=chromosome2[index];
-                secondDescendent[index]=chromosome1[index];
-            }
-            else{
-                firstDescendent[index]=chromosome1[index];
-                secondDescendent[index]=chromosome2[index];
-            }
-        }
-        newGeneration.add(firstDescendent);
-        newGeneration.add(secondDescendent);
-        return newGeneration;
-    }
-
-    public ArrayList<short[]> getTwoCromosome(){
-        int[] roulette=generateRoulette();
-        ArrayList<short[]> chosenOnes=new ArrayList<>();
-        int fitnessSummatory=fitnessSummatory();
+    public static ArrayList<Chromosome> getTwoCromosome(List<Chromosome> population){
+        int[] roulette=generateRoulette(population);
+        ArrayList<Chromosome> chosenOnes=new ArrayList<>();
+        int fitnessSummatory=fitnessSummatory(population);
         Random random=new Random();
         for(int index=0; index<2; index++) {
             int randomIndex = (int) (random.nextDouble() * fitnessSummatory);
@@ -163,13 +79,13 @@ public class GA {
         return chosenOnes;
     }
 
-    private int[] generateRoulette(){
-        int fitnessSummatory=fitnessSummatory();
+    private static int[] generateRoulette(List<Chromosome> population){
+        int fitnessSummatory=fitnessSummatory(population);
         int[] roulette=new int[fitnessSummatory];
         int rouletteIndex=0;
         int chromosomeIndex=0;
-        for(short[] chromosome: population){
-            int fitness=fitness(chromosome);
+        for(Chromosome chromosome: population){
+            int fitness=chromosome.getFitness();
             for(int index=rouletteIndex;index<(rouletteIndex+fitness);index++){
                 roulette[index]=chromosomeIndex;
             }
@@ -179,24 +95,12 @@ public class GA {
         return roulette;
     }
 
-    private int fitnessSummatory(){
+    private static int fitnessSummatory(List<Chromosome> population){
         int fitnessCounter=0;
-        for(short[] chromosome : population){
-            fitnessCounter+=fitness(chromosome);
+        for(Chromosome chromosome : population){
+            fitnessCounter+=chromosome.getFitness();
         }
         return fitnessCounter;
-    }
-
-    @Override
-    public String toString(){
-        String representation="";
-        for (short[] unit: population){
-            for (short chromosome: unit){
-                representation+=chromosome+" ";
-            }
-            representation+="\n";
-        }
-        return representation;
     }
 }
 
