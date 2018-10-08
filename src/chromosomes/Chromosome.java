@@ -7,9 +7,13 @@ import java.util.List;
  */
 public interface Chromosome {
     int getFitness();
+
     List<Chromosome> cross(Chromosome toCross);
+
     boolean converged();
+
     void mutate();
+
     @Override
     String toString();
 }

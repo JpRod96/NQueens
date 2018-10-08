@@ -86,8 +86,8 @@ public class Canonical implements Chromosome {
     @Override
     public String toString(){
         String representation="";
-        for (short chromosome: structure){
-            representation+=chromosome+" ";
+        for (short part: structure){
+            representation+=part+" ";
         }
         representation+="\n";
         return representation;

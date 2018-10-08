@@ -23,7 +23,7 @@ public class GA {
                 mutate(descendents.get(1), mutationProbability);
                 temporalPopulation.addAll(descendents);
             }
-            int criticalFitness=fitnessSummatory(population)/population.size()+1;
+            int criticalFitness=(fitnessSummatory(population)/population.size())+1;
             population.addAll(temporalPopulation);
             if(!doesConverge(population, convergeMinimumRate)){
                 System.out.println("       antes "+population.size());
@@ -50,7 +50,7 @@ public class GA {
     public static void mutate(Chromosome chromosome, double mutationProbability){
         Random random=new Random();
         double aux=random.nextDouble();
-        if(aux>=mutationProbability){
+        if(aux>(1 - mutationProbability)){
             chromosome.mutate();
             System.out.println("       Muto");
         }
