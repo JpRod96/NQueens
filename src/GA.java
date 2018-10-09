@@ -3,6 +3,7 @@ import chromosomes.Chromosome;
 import com.sun.javafx.scene.CameraHelper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -27,6 +28,7 @@ public class GA {
             population.addAll(temporalPopulation);
             if(!doesConverge(population, convergeMinimumRate)){
                 System.out.println("       antes "+population.size());
+                //reduxPopulation(criticalFitness, population);
                 reduxPopulation(criticalFitness, population);
                 System.out.println("       despues: "+population.size());
                 System.out.println("       fitness "+criticalFitness);
@@ -38,13 +40,18 @@ public class GA {
     }
 
     public static void reduxPopulation(int averageFitness, List<Chromosome> population){
-        for(int index=0; index<population.size(); index++){
+        for(int index=1; index<population.size(); index++){
             Chromosome chromosome=population.get(index);
             if(chromosome.getFitness()<averageFitness){
                 population.remove(chromosome);
                 index--;
             }
         }
+    }
+
+    public static List<Chromosome> reduxPopulation(List<Chromosome> population){
+        Collections.sort(population);
+        return population.subList(0,100);
     }
 
     public static void mutate(Chromosome chromosome, double mutationProbability){

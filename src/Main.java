@@ -16,11 +16,14 @@ public class Main {
         int chromosomeSize=10;
         int populationSize=(int)(factorial(chromosomeSize)*populationRate);
         double mutationProbability=0.001;
-        double convergeMinimumRate=0.2;
+        double convergeMinimumRate=1.0;
         double crossProbability=0.7;
 
         List<Chromosome> initialPopulation=generateQueenPopulation(populationSize,chromosomeSize);
         System.out.println(GA.run(initialPopulation, crossProbability, mutationProbability, convergeMinimumRate));
+        /*int[] struc={9, 7, 4, 2, 0, 5, 1, 8, 6, 3};
+        QueenChromosome q=new QueenChromosome(struc);
+        System.out.println(q.getFitness());*/
         //canonicalTest();
     }
 
@@ -40,6 +43,8 @@ public class Main {
         for(int index = 1; index<= populationSize; index++){
             population.add(new QueenChromosome(generateUnit(chromosomeSize, chromosomeSize)));
         }
+        int[] structure={9, 7, 4, 2, 0, 5, 1, 8, 6, 3};
+        population.add(0, new QueenChromosome(structure));
         return population;
     }
 
