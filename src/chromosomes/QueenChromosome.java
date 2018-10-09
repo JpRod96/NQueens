@@ -7,7 +7,7 @@ import java.util.Random;
 /**
  * Created by Jp on 07/10/2018.
  */
-public class QueenChromosome implements Chromosome{
+public class QueenChromosome implements Chromosome, Comparable{
     private int[] structure;
     private int size;
     private final double MERGE_RATE=0.25;
@@ -144,5 +144,18 @@ public class QueenChromosome implements Chromosome{
             }
         }
         return false;
+    }
+
+    @Override
+    public int compareTo(Object o){
+        QueenChromosome anotherQueen=(QueenChromosome)o;
+        if(anotherQueen.getFitness()==getFitness()){
+            return 0;
+        }
+        else if(anotherQueen.getFitness()>getFitness()){
+            return -1;
+        }else{
+            return 1;
+        }
     }
 }

@@ -92,4 +92,9 @@ public class Canonical implements Chromosome {
         representation+="\n";
         return representation;
     }
+
+    @Override
+    public int compareTo(Object o){
+        return 0;
+    }
 }

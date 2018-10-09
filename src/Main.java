@@ -16,7 +16,7 @@ public class Main {
         int chromosomeSize=10;
         int populationSize=(int)(factorial(chromosomeSize)*populationRate);
         double mutationProbability=0.001;
-        double convergeMinimumRate=5.0;
+        double convergeMinimumRate=0.2;
         double crossProbability=0.7;
 
         List<Chromosome> initialPopulation=generateQueenPopulation(populationSize,chromosomeSize);
@@ -27,9 +27,9 @@ public class Main {
     private static void canonicalTest(){
         int populationSize=100;
         int chromosomeSize=20;
-        double mutationProbability=0.001;
+        double mutationProbability=1.0;
         double convergeMinimumRate=1.0;
-        double crossProbability=0.7;
+        double crossProbability=0.02;
 
         List<Chromosome> initialPopulation=generateCanonicalPopulation(populationSize,chromosomeSize);
         System.out.println(GA.run(initialPopulation, crossProbability, mutationProbability, convergeMinimumRate));

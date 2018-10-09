@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by Jp on 06/10/2018.
  */
-public interface Chromosome {
+public interface Chromosome extends Comparable{
     int getFitness();
 
     List<Chromosome> cross(Chromosome toCross);
