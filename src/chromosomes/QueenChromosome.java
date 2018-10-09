@@ -153,9 +153,9 @@ public class QueenChromosome implements Chromosome, Comparable{
             return 0;
         }
         else if(anotherQueen.getFitness()>getFitness()){
-            return -1;
-        }else{
             return 1;
+        }else{
+            return -1;
         }
     }
 }
