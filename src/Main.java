@@ -61,11 +61,25 @@ public class Main {
 
     public static int[] generateUnit(int chromosomeSize, int exclusiveBound){
         int[] structure=new int[chromosomeSize];
+        boolean[] checker=generateChecker(chromosomeSize);
         for (int index = 0; index< chromosomeSize; index++){
             Random random=new Random();
-            structure[index]=(int)(random.nextDouble()*exclusiveBound);
+            int randomValue=(int)(random.nextDouble()*exclusiveBound);
+            while (checker[randomValue]){
+                randomValue=(int)(random.nextDouble()*exclusiveBound);
+            }
+            checker[randomValue]=true;
+            structure[index]=randomValue;
         }
         return structure;
+    }
+
+    private static boolean[] generateChecker(int size){
+        boolean[] checker=new boolean[size];
+        for(int index=0; index<size; index++){
+            checker[index]=false;
+        }
+        return checker;
     }
 
     public static Canonical generateUnitShorts(int chromosomeSize){
