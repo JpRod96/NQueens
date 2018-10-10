@@ -12,18 +12,23 @@ import java.util.Random;
 public class Main {
 
     public static void main(String[] args){
-        /*double populationRate=0.02;
+        double populationRate=0.02;
         int chromosomeSize=10;
-        int populationSize=(int)(factorial(chromosomeSize)*populationRate);
+        int populationSize=5000;
         double mutationProbability=0.001;
         double convergeMinimumRate=1.0;
         double crossProbability=0.7;
-
-        List<Chromosome> initialPopulation=generateQueenPopulation(populationSize,chromosomeSize);
-        System.out.println(GA.run(initialPopulation, crossProbability, mutationProbability, convergeMinimumRate));*/
-        int[] struc={1,3,8,6,4,9,0,5,7,2};
+        for(int index=1; index<=20; index++){
+            System.out.println(index+" corrida");
+            List<Chromosome> initialPopulation=generateQueenPopulation(populationSize,chromosomeSize);
+            long before=System.currentTimeMillis();
+            System.out.println(GA.run(initialPopulation, crossProbability, mutationProbability, convergeMinimumRate));
+            long after=System.currentTimeMillis();
+            System.out.println(after-before+" ms");
+        }
+        /*int[] struc={1,3,8,6,4,9,0,5,7,2};
         QueenChromosome q=new QueenChromosome(struc);
-        System.out.println(q.getFitness());
+        System.out.println(q.getFitness());*/
         //canonicalTest();
     }
 
@@ -43,9 +48,12 @@ public class Main {
         for(int index = 1; index<= populationSize; index++){
             population.add(new QueenChromosome(generateUnit(chromosomeSize, chromosomeSize)));
         }
-        for (int index=1; index<150; index++){
-            //int[] structure={9, 7, 4, 2, 0, 5, 1, 8, 6, 3};
+        for (int index=1; index<100; index++){
             int[] structure={0,2,5,7,9,4,8,1,3,6};
+            population.add(0, new QueenChromosome(structure));
+        }
+        for (int index=1; index<100; index++){
+            int[] structure={9, 7, 4, 2, 0, 5, 1, 8, 6, 3};
             population.add(0, new QueenChromosome(structure));
         }
         return population;

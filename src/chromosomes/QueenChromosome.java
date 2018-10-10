@@ -31,12 +31,88 @@ public class QueenChromosome implements Chromosome, Comparable{
         return getFitness()==size;
     }
 
-    public List<Chromosome> cross(Chromosome anotherChromosome){
+    /*public List<Chromosome> cross(Chromosome anotherChromosome){
         ArrayList<Chromosome> newGeneration=new ArrayList<>();
         QueenChromosome anotherQC=(QueenChromosome)anotherChromosome;
         newGeneration.add(cross(this, anotherQC));
         newGeneration.add(cross(anotherQC, this));
         return newGeneration;
+    }*/
+
+    public List<Chromosome> cross(Chromosome anotherChromosome){
+        ArrayList<Chromosome> newGeneration=new ArrayList<>();
+        QueenChromosome anotherQC=(QueenChromosome)anotherChromosome;
+        Random random=new Random();
+        int firstIndex=(int)(random.nextDouble()*size);
+        int secondIndex=(int)(random.nextDouble()*size);
+        while (firstIndex==secondIndex){
+            secondIndex=(int)(random.nextDouble()*size);
+        }
+        if(firstIndex>secondIndex){
+            if(firstIndex==size-1){
+                firstIndex--;
+            }
+            newGeneration.add(cross(this, anotherQC, secondIndex, firstIndex));
+            newGeneration.add(cross(anotherQC, this, secondIndex, firstIndex));
+        }
+        else {
+            if(secondIndex==size-1){
+                secondIndex--;
+            }
+            newGeneration.add(cross(this, anotherQC, firstIndex, secondIndex));
+            newGeneration.add(cross(anotherQC, this, firstIndex, secondIndex));
+        }
+        return newGeneration;
+    }
+
+    public QueenChromosome cross(QueenChromosome base, QueenChromosome modifier, int innerBound, int outerBound){
+        boolean[] visited=generatedLog();
+        int[] structure=new int[size];
+        for (int index=innerBound; index<=outerBound; index++){
+            int value=modifier.structure[index];
+            structure[index]=value;
+            visited[value]=true;
+        }
+        for(int index=0; index<innerBound; index++){
+            int value=base.structure[index];
+            if(!visited[value]){
+                structure[index]=value;
+                visited[value]=true;
+            }else {
+                value=getFirstFreeIndex(visited);
+                structure[index]=value;
+                visited[value]=true;
+            }
+        }
+        for(int index=outerBound+1; index<size; index++){
+            int value=base.structure[index];
+            if(!visited[value]){
+                structure[index]=value;
+                visited[value]=true;
+            }else {
+                value=getFirstFreeIndex(visited);
+                structure[index]=value;
+                visited[value]=true;
+            }
+        }
+        return new QueenChromosome(structure);
+    }
+
+    private int getFirstFreeIndex(boolean[] visited){
+        for (int index=0; index<size; index++){
+            if(!visited[index]){
+                return index;
+            }
+        }
+        return -1;
+    }
+
+    private boolean[] generatedLog(){
+        boolean[] visited=new boolean[size];
+        for (int index=0; index<size; index++){
+            visited[index]=false;
+        }
+        return visited;
     }
 
     public void mutate(){
